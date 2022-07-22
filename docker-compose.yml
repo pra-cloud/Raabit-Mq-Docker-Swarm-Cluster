@@ -1,0 +1,44 @@
+version: "3"
+services:
+  rabbit-master:
+    image: rabbitmq:3.8-management
+    ports:
+      - "15672:15672"
+    volumes:
+      - ${PWD}/config/rabbit-1/:/config/
+    hostname: rabbit-1
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=VYEMQPUFWSOVDNGYVJLN
+      - RABBITMQ_CONFIG_FILE=/config/rabbitmq
+  rabbit-slave:
+    image: rabbitmq:3.8-management
+    ports:
+      - "15673:15672"
+    volumes:
+      - ${PWD}/config/rabbit-2/:/config/
+    hostname: rabbit-2
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role != manager]
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=VYEMQPUFWSOVDNGYVJLN
+      - RABBITMQ_CONFIG_FILE=/config/rabbitmq
+  rabbit-slave-2:
+    image: rabbitmq:3.8-management
+    ports:
+      - "15674:15672"
+    volumes:
+      - ${PWD}/config/rabbit-3/:/config/
+    hostname: rabbit-3
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role != manager]
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=VYEMQPUFWSOVDNGYVJLN
+      - RABBITMQ_CONFIG_FILE=/config/rabbitmq

@@ -1,0 +1,34 @@
+#create docker swarm cluster
+
+#make directory 
+ config> rabbit-1 , rabbit-2 rabbit-3 
+
+in all ec2 instaance
+
+and place rabbitmq.conf file inside each directory 
+
+#then make docker-compose.yml file in manager node of the docker swarm
+
+#run this command in swarm manager node
+
+docker stack deploy -c docker-compose.yml rabbitcluster
+
+# Let's set up the mirror for all the nodes, but before that, we need to enable the federation plugin.
+
+docker exec -it rabbit-1 rabbitmq-plugins enable rabbitmq_federation
+docker exec -it rabbit-2 rabbitmq-plugins enable rabbitmq_federation
+docker exec -it rabbit-3 rabbitmq-plugins enable rabbitmq_federation
+
+#### for enabling high availability in cluster
+
+docker exec -it rabbit-1 bash
+rabbitmqctl set_policy ha-fed \
+    ".*" '{"federation-upstream-set":"all","ha-sync-mode":"automatic", "ha-mode":"nodes", "ha-params":["rabbit@rabbit-1","rabbit@rabbit-2","rabbit@rabbit-3"]}' \
+    --priority 1 \
+    --apply-to queues
+
+
+
+
+### link:- https://levelup.gitconnected.com/setting-up-rabbitmq-cluster-c247d61385ed
+
